@@ -11,7 +11,11 @@ planets = [
     Planet(1, "Mercury", 35.98, 88),
     Planet(2, "Venus", 67.24, 225),
     Planet(3, "Earth", 92.96, 365.24),
-    Planet(4, "Mars", 141.6, 693.5)
+    Planet(4, "Mars", 141.6, 693.96)
+    Planet(5, "Jupiter", 462.31, 4346.36)
+    Planet(6, "Saturn", 918.35, 10774.58)
+    Planet(7, "Uranus", 1.8313, 30680.16)
+    Planet(8, "Neptune", 2.7803, 60191.55)
 ]
 
 planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
