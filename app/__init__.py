@@ -11,7 +11,6 @@ load_dotenv()
 
 def create_app(testing=False):
     app = Flask(__name__)
-
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #deal with database
     
     if testing == {"testing":True}:
