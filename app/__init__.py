@@ -9,6 +9,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 load_dotenv()
 
+# some changes
 def create_app(testing=False):
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #deal with database
