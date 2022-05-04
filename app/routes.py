@@ -21,16 +21,16 @@ from app import db
 #     Planet(8, "Neptune", 2.7803, 60191.55)
 # ]
 
-# def validate_planet(planet_id):
-#     try:
-#         planet_id = int(planet_id)
-#     except ValueError:
-#         abort(make_response({"msg": f"Invalid planet ID: {planet_id}"}, 400))
+def get_planet_or_abort(planet_id):
+    try:
+        planet_id = int(planet_id)
+    except ValueError:
+        abort(make_response({"msg": f"Invalid planet ID: {planet_id}"}, 400))
+    planet = Planet.query.get(planet_id)
+    if planet is None:
+        abort(make_response({"msg": f"Could not find planet with ID: {planet_id}"}, 404))
+    return planet
     
-#     for planet in planets:
-#         if planet.id == planet_id:
-#             return planet
-#     abort(make_response({"msg": f"Could not find planet with ID: {planet_id}"}, 404))
 
 planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
 
@@ -61,6 +61,9 @@ def get_all_planets():
     return jsonify(planets_response), 300
 
 
+# get_planet_or_abort(planet_id)
+
+
 # @planets_bp.route("", methods=["GET"])
 # def get_all_planets():
 #     planet_response = []
@@ -73,15 +76,44 @@ def get_all_planets():
 #         })
 #     return jsonify(planet_response), 200
 
-# @planets_bp.route("/<planet_id>", methods=["GET"])
-# def get_one_planet(planet_id):
-#     planet = validate_planet(planet_id)
+@planets_bp.route("/<planet_id>", methods=["GET"])
+def get_one_planet(planet_id):
+    planet = get_planet_or_abort(planet_id)
         
-#     rsp = {
-#         "id": planet.id,
-#         "name": planet.name,
-#         "distance_from_sun_million_mi": planet.distance_from_sun_million_mi,
-#         "length_of_year_earth_days": planet.length_of_year_earth_days
-#     }
-#     return jsonify(rsp), 200
+    rsp = {
+        "id": planet.id,
+        "name": planet.name,
+        "distance_from_sun_million_mi": planet.distance_from_sun_million_mi,
+        "length_of_year_earth_days": planet.length_of_year_earth_days
+    }
+    return jsonify(rsp), 200
+
+@planets_bp.route("/<planet_id>", methods=["PUT"])
+def put_one_planet(planet_id):
+    planet = get_planet_or_abort(planet_id)
+    request_body = request.get_json()
+    try:
+        planet.name = request_body["name"]
+        planet.distance_from_sun_million_mi = request_body["distance_from_sun_million_mi"]
+        planet.length_of_year_earth_days = request_body["length_of_year_earth_days"]
+    except KeyError:
+        return {
+            "msg" : "name, distance from the sun, and length of year are required"
+        }, 400
+        
+    db.session.commit()
+    return {
+            "msg" : f"planet #{planet_id} successfully replaced"
+        }, 200
+    
+@planets_bp.route("/<planet_id>", methods=["DELETE"])
+def delete_one_planet(planet_id):
+    planet = get_planet_or_abort(planet_id)
+    db.session.delete(planet)
+    db.session.commit()
+    return {
+            "msg" : f"planet #{planet_id} successfully deleted"
+        }, 200
+    
+    
     
